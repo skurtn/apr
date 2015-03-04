@@ -5,8 +5,8 @@
 
 Summary: Apache Portable Runtime library
 Name: apr
-Version: 1.4.8
-Release: 3%{?dist}
+Version: 1.5.1
+Release: 1%{?dist}
 # ASL 2.0: everything
 # ISC: network_io/apr-1.4.6/network_io/unix/inet_?to?.c
 # BSD with advertising: strings/apr_snprintf.c, strings/apr_fnmatch.c,
@@ -39,9 +39,9 @@ Conflicts: subversion-devel < 0.20.1-2
 Requires: apr = %{version}-%{release}, pkgconfig
 
 %description devel
-This package provides the support files which can be used to 
+This package provides the support files which can be used to
 build applications using the APR library.  The mission of the
-Apache Portable Runtime (APR) is to provide a free library of 
+Apache Portable Runtime (APR) is to provide a free library of
 C data structures and routines.
 
 %prep
@@ -80,7 +80,7 @@ sed -ri '/^Libs/{s,-l(uuid|crypt) ,,g}' \
       $RPM_BUILD_ROOT%{_libdir}/pkgconfig/apr-%{aprver}.pc
 
 %ifarch %{multilib_arches}
-# Ugly hack to allow parallel installation of 32-bit and 64-bit apr-devel 
+# Ugly hack to allow parallel installation of 32-bit and 64-bit apr-devel
 # packages:
 mv $RPM_BUILD_ROOT%{_includedir}/apr-%{aprver}/apr.h \
    $RPM_BUILD_ROOT%{_includedir}/apr-%{aprver}/apr-%{_arch}.h
