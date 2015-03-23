@@ -6,7 +6,7 @@
 Summary: Apache Portable Runtime library
 Name: apr
 Version: 1.5.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 # ASL 2.0: everything
 # ISC: network_io/apr-1.4.6/network_io/unix/inet_?to?.c
 # BSD with advertising: strings/apr_snprintf.c, strings/apr_fnmatch.c,
@@ -21,6 +21,7 @@ Source1: apr-wrapper.h
 Patch2: apr-1.2.2-locktimeout.patch
 Patch3: apr-1.2.2-libdir.patch
 Patch4: apr-1.2.7-pkgconf.patch
+Patch10: apr-1.4.2.1_cloudlinux_apr.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 BuildRequires: autoconf, libtool, libuuid-devel, python
 # To enable SCTP support
@@ -49,6 +50,7 @@ C data structures and routines.
 %patch2 -p1 -b .locktimeout
 %patch3 -p1 -b .libdir
 %patch4 -p1 -b .pkgconf
+%patch10 -p3 -b .cloudlinux
 
 %build
 # regenerate configure script etc.
@@ -129,6 +131,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/aclocal/*.m4
 
 %changelog
+* Mon Mar 23 2015 Trinity Quirk <trinity.quirk@cpanel.net> - 1.5.1-2
+- Added CloudLinux patch
+
+* Fri Feb 27 2015 Trinity Quirk <trinity.quirk@cpanel.net> - 1.5.1-1
+- Upgraded to 1.5.1
+
 * Fri Jan 24 2014 Daniel Mach <dmach@redhat.com> - 1.4.8-3
 - Mass rebuild 2014-01-24
 
