@@ -1,12 +1,15 @@
+%global ns_name ea
+%global pkgname %{ns_name}-apr
+
 %define aprver 1
 
 # Arches on which the multilib apr.h hack is needed:
 %define multilib_arches %{ix86} ia64 ppc ppc64 s390 s390x x86_64
 
 Summary: Apache Portable Runtime library
-Name: apr
+Name: %{pkgname}
 Version: 1.5.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 # ASL 2.0: everything
 # ISC: network_io/apr-1.4.6/network_io/unix/inet_?to?.c
 # BSD with advertising: strings/apr_snprintf.c, strings/apr_fnmatch.c,
@@ -16,7 +19,7 @@ Release: 2%{?dist}
 License: ASL 2.0 and BSD with advertising and ISC and BSD
 Group: System Environment/Libraries
 URL: http://apr.apache.org/
-Source0: http://www.apache.org/dist/apr/%{name}-%{version}.tar.bz2
+Source0: http://www.apache.org/dist/apr/apr-%{version}.tar.bz2
 Source1: apr-wrapper.h
 Patch2: apr-1.2.2-locktimeout.patch
 Patch3: apr-1.2.2-libdir.patch
@@ -26,6 +29,7 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 BuildRequires: autoconf, libtool, libuuid-devel, python
 # To enable SCTP support
 BuildRequires: lksctp-tools-devel
+Conflicts: apr
 
 %description
 The mission of the Apache Portable Runtime (APR) is to provide a
@@ -37,7 +41,8 @@ including Unices, MS Win32, BeOS and OS/2.
 Group: Development/Libraries
 Summary: APR library development kit
 Conflicts: subversion-devel < 0.20.1-2
-Requires: apr = %{version}-%{release}, pkgconfig
+Requires: %{pkgname} = %{version}-%{release}, pkgconfig
+Conflicts: apr-devel
 
 %description devel
 This package provides the support files which can be used to
@@ -46,7 +51,7 @@ Apache Portable Runtime (APR) is to provide a free library of
 C data structures and routines.
 
 %prep
-%setup -q
+%setup -q -n apr-%{version}
 %patch2 -p1 -b .locktimeout
 %patch3 -p1 -b .libdir
 %patch4 -p1 -b .pkgconf
@@ -131,6 +136,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/aclocal/*.m4
 
 %changelog
+* Thu Mar 26 2015 Trinity Quirk <trinity.quirk@cpanel.net> - 1.5.1-3
+- Renamed to ea-apr, added conflicts with apr*
+
 * Mon Mar 23 2015 Trinity Quirk <trinity.quirk@cpanel.net> - 1.5.1-2
 - Added CloudLinux patch
 
