@@ -2,6 +2,11 @@
 %global pkgname %{ns_name}-apr
 
 %define aprver 1
+%define prefix_name ea-apr15
+%define prefix_dir /opt/cpanel/ea-apr15
+%define prefix_lib %{prefix_dir}/%{_lib}
+%define prefix_bin %{prefix_dir}/bin
+%define prefix_inc %{prefix_dir}/include
 
 # Arches on which the multilib apr.h hack is needed:
 %define multilib_arches %{ix86} ia64 ppc ppc64 s390 s390x x86_64
@@ -9,7 +14,7 @@
 Summary: Apache Portable Runtime library
 Name: %{pkgname}
 Version: 1.5.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 # ASL 2.0: everything
 # ISC: network_io/apr-1.4.6/network_io/unix/inet_?to?.c
 # BSD with advertising: strings/apr_snprintf.c, strings/apr_fnmatch.c,
@@ -29,7 +34,6 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 BuildRequires: autoconf, libtool, libuuid-devel, python
 # To enable SCTP support
 BuildRequires: lksctp-tools-devel
-Conflicts: apr
 
 %description
 The mission of the Apache Portable Runtime (APR) is to provide a
@@ -42,7 +46,6 @@ Group: Development/Libraries
 Summary: APR library development kit
 Conflicts: subversion-devel < 0.20.1-2
 Requires: %{pkgname} = %{version}-%{release}, pkgconfig
-Conflicts: apr-devel
 
 %description devel
 This package provides the support files which can be used to
@@ -65,10 +68,11 @@ C data structures and routines.
 # does not use -lrt).
 export ac_cv_search_shm_open=no
 
-%configure \
-        --includedir=%{_includedir}/apr-%{aprver} \
-        --with-installbuilddir=%{_libdir}/apr-%{aprver}/build \
-        --with-devrandom=/dev/urandom
+./configure \
+        --with-devrandom=/dev/urandom \
+        --prefix=%{prefix_dir} \
+        --libdir=%{prefix_lib} \
+        --with-installbuilddir=%{prefix_lib}/apr-%{aprver}/build
 make %{?_smp_mflags}
 
 %install
@@ -80,23 +84,29 @@ install -m 644 build/find_apr.m4 $RPM_BUILD_ROOT/%{_datadir}/aclocal
 
 # Trim exported dependecies
 sed -ri '/^dependency_libs/{s,-l(uuid|crypt) ,,g}' \
-      $RPM_BUILD_ROOT%{_libdir}/libapr*.la
-sed -ri '/^LIBS=/{s,-l(uuid|crypt) ,,g;s/  */ /g}' \
-      $RPM_BUILD_ROOT%{_bindir}/apr-%{aprver}-config
+      $RPM_BUILD_ROOT%{prefix_lib}/libapr*.la
+# Also set pkgconfig to reference the right defs file
+sed -ri '/^LIBS=/{s,-l(uuid|crypt) ,,g;s/  */ /g};/pkg-config/{s,apr-%{aprver},%{prefix_name}-%{aprver},g}' \
+      $RPM_BUILD_ROOT%{prefix_bin}/apr-%{aprver}-config
 sed -ri '/^Libs/{s,-l(uuid|crypt) ,,g}' \
-      $RPM_BUILD_ROOT%{_libdir}/pkgconfig/apr-%{aprver}.pc
+      $RPM_BUILD_ROOT%{prefix_lib}/pkgconfig/apr-%{aprver}.pc
+
+# In order for apr and our package to coexist, we have to name our
+# pkgconfig files something else
+mkdir -p $RPM_BUILD_ROOT%{_libdir}/pkgconfig
+mv $RPM_BUILD_ROOT%{prefix_lib}/pkgconfig/apr-%{aprver}.pc $RPM_BUILD_ROOT%{_libdir}/pkgconfig/%{prefix_name}-%{aprver}.pc
 
 %ifarch %{multilib_arches}
 # Ugly hack to allow parallel installation of 32-bit and 64-bit apr-devel
 # packages:
-mv $RPM_BUILD_ROOT%{_includedir}/apr-%{aprver}/apr.h \
-   $RPM_BUILD_ROOT%{_includedir}/apr-%{aprver}/apr-%{_arch}.h
-install -c -m644 %{SOURCE1} $RPM_BUILD_ROOT%{_includedir}/apr-%{aprver}/apr.h
+mv $RPM_BUILD_ROOT%{prefix_inc}/apr-%{aprver}/apr.h \
+   $RPM_BUILD_ROOT%{prefix_inc}/apr-%{aprver}/apr-%{_arch}.h
+install -c -m644 %{SOURCE1} $RPM_BUILD_ROOT%{prefix_inc}/apr-%{aprver}/apr.h
 %endif
 
 # Unpackaged files:
-rm -f $RPM_BUILD_ROOT%{_libdir}/apr.exp \
-      $RPM_BUILD_ROOT%{_libdir}/libapr-*.a
+rm -f $RPM_BUILD_ROOT%{prefix_lib}/apr.exp \
+      $RPM_BUILD_ROOT%{prefix_lib}/libapr-*.a
 
 %check
 # Fail if LFS support isn't present in a 32-bit build, since this
@@ -118,24 +128,27 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root,-)
 %doc CHANGES LICENSE NOTICE
-%{_libdir}/libapr-%{aprver}.so.*
+%{prefix_lib}/libapr-%{aprver}.so.*
 
 %files devel
 %defattr(-,root,root,-)
 %doc docs/APRDesign.html docs/canonical_filenames.html
 %doc docs/incomplete_types docs/non_apr_programs
-%{_bindir}/apr-%{aprver}-config
-%{_libdir}/libapr-%{aprver}.*a
-%{_libdir}/libapr-%{aprver}.so
+%{prefix_bin}/apr-%{aprver}-config
+%{prefix_lib}/libapr-%{aprver}.*a
+%{prefix_lib}/libapr-%{aprver}.so
 %{_libdir}/pkgconfig/*.pc
-%dir %{_libdir}/apr-%{aprver}
-%dir %{_libdir}/apr-%{aprver}/build
-%{_libdir}/apr-%{aprver}/build/*
-%dir %{_includedir}/apr-%{aprver}
-%{_includedir}/apr-%{aprver}/*.h
-%{_datadir}/aclocal/*.m4
+%dir %{prefix_lib}/apr-%{aprver}
+%dir %{prefix_lib}/apr-%{aprver}/build
+%{prefix_lib}/apr-%{aprver}/build/*
+%dir %{prefix_inc}/apr-%{aprver}
+%{prefix_inc}/apr-%{aprver}/*.h
+%{_datadir}/aclocal/find_apr.m4
 
 %changelog
+* Mon Jun 29 2015 Matt Dees <matt@cpanel.net> 1.5.1-4
+- Move ea-apr to /opt/cpanel/ea-apr15
+
 * Thu Mar 26 2015 Trinity Quirk <trinity.quirk@cpanel.net> - 1.5.1-3
 - Renamed to ea-apr, added conflicts with apr*
 
