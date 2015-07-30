@@ -8,9 +8,6 @@
 %define prefix_bin %{prefix_dir}/bin
 %define prefix_inc %{prefix_dir}/include
 
-# Turn off the debuginfo package
-%define debug_package %{nil}
-
 # Arches on which the multilib apr.h hack is needed:
 %define multilib_arches %{ix86} ia64 ppc ppc64 s390 s390x x86_64
 
