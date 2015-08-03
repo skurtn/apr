@@ -1,0 +1,14 @@
+#
+# Locations for apr
+#
+%@NAMESPACE@apr_name @APR_NAME@
+%@NAMESPACE@apr_ver  @APR_VER@
+%@NAMESPACE@apr_dir  @APR_DIR@
+
+%ea_apr_fix_pkgconfig() %{expand:
+  sed -ri '/pkg-config/{s/apr-%{@NAMESPACE@apr_ver}/%{@NAMESPACE@apr_name}-%{@NAMESPACE@apr_ver}/}' %1
+}
+
+%ea_apr_fix_requires() %{expand:
+  sed -ri '/^Requires:/{s/apr-%{@NAMESPACE@apr_ver}/%{@NAMESPACE@apr_name}-%{@NAMESPACE@apr_ver}/}' %1
+}

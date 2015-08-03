@@ -2,8 +2,8 @@
 %global pkgname %{ns_name}-apr
 
 %define aprver 1
-%define prefix_name ea-apr15
-%define prefix_dir /opt/cpanel/ea-apr15
+%define prefix_name %{pkgname}15
+%define prefix_dir /opt/cpanel/%{prefix_name}
 %define prefix_lib %{prefix_dir}/%{_lib}
 %define prefix_bin %{prefix_dir}/bin
 %define prefix_inc %{prefix_dir}/include
@@ -14,7 +14,7 @@
 Summary: Apache Portable Runtime library
 Name: %{pkgname}
 Version: 1.5.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 # ASL 2.0: everything
 # ISC: network_io/apr-1.4.6/network_io/unix/inet_?to?.c
 # BSD with advertising: strings/apr_snprintf.c, strings/apr_fnmatch.c,
@@ -26,6 +26,7 @@ Group: System Environment/Libraries
 URL: http://apr.apache.org/
 Source0: http://www.apache.org/dist/apr/apr-%{version}.tar.bz2
 Source1: apr-wrapper.h
+Source2: macros.ea-apr
 Patch2: apr-1.2.2-locktimeout.patch
 Patch3: apr-1.2.2-libdir.patch
 Patch4: apr-1.2.7-pkgconf.patch
@@ -96,6 +97,14 @@ sed -ri '/^Libs/{s,-l(uuid|crypt) ,,g}' \
 mkdir -p $RPM_BUILD_ROOT%{_libdir}/pkgconfig
 mv $RPM_BUILD_ROOT%{prefix_lib}/pkgconfig/apr-%{aprver}.pc $RPM_BUILD_ROOT%{_libdir}/pkgconfig/%{prefix_name}-%{aprver}.pc
 
+# Set up the macros file
+install -d -m 755 $RPM_BUILD_ROOT%{_sysconfdir}/rpm
+sed -e 's/@APR_NAME@/%{prefix_name}/g' \
+    -e 's/@APR_VER@/%{aprver}/g' \
+    -e 's,@APR_DIR@,%{prefix_dir},g' \
+    -e 's/@NAMESPACE@/%{ns_name}_/g' \
+    %{SOURCE2} > $RPM_BUILD_ROOT%{_sysconfdir}/rpm/macros.%{pkgname}
+
 %ifarch %{multilib_arches}
 # Ugly hack to allow parallel installation of 32-bit and 64-bit apr-devel
 # packages:
@@ -144,8 +153,12 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{prefix_inc}/apr-%{aprver}
 %{prefix_inc}/apr-%{aprver}/*.h
 %{_datadir}/aclocal/find_apr.m4
+%{_sysconfdir}/rpm/macros.%{pkgname}
 
 %changelog
+* Fri Jul 31 2015 Trinity Quirk <trinity.quirk@cpanel.net> 1.5.1-5
+- Added macro handling for dependency resolution
+
 * Mon Jun 29 2015 Matt Dees <matt@cpanel.net> 1.5.1-4
 - Move ea-apr to /opt/cpanel/ea-apr15
 
