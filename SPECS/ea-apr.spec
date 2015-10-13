@@ -13,8 +13,8 @@
 
 Summary: Apache Portable Runtime library
 Name: %{pkgname}
-Version: 1.5.1
-Release: 5%{?dist}
+Version: 1.5.2
+Release: 1%{?dist}
 # ASL 2.0: everything
 # ISC: network_io/apr-1.4.6/network_io/unix/inet_?to?.c
 # BSD with advertising: strings/apr_snprintf.c, strings/apr_fnmatch.c,
@@ -156,6 +156,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.%{pkgname}
 
 %changelog
+* Tue Oct 13 2015 Jacob Perkins <jacob.perkins@cpanel.net> - 1.5.2-1
+- Updated to version 1.5.2 via update_pkg.pl
+
 * Fri Jul 31 2015 Trinity Quirk <trinity.quirk@cpanel.net> 1.5.1-5
 - Added macro handling for dependency resolution
 
