@@ -14,7 +14,7 @@
 Summary: Apache Portable Runtime library
 Name: %{pkgname}
 Version: 1.5.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 # ASL 2.0: everything
 # ISC: network_io/apr-1.4.6/network_io/unix/inet_?to?.c
 # BSD with advertising: strings/apr_snprintf.c, strings/apr_fnmatch.c,
@@ -30,7 +30,6 @@ Source2: macros.ea-apr
 Patch2: apr-1.2.2-locktimeout.patch
 Patch3: apr-1.2.2-libdir.patch
 Patch4: apr-1.2.7-pkgconf.patch
-Patch10: apr-1.4.2.1_cloudlinux_apr.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 BuildRequires: autoconf, libtool, libuuid-devel, python
 # To enable SCTP support
@@ -59,7 +58,6 @@ C data structures and routines.
 %patch2 -p1 -b .locktimeout
 %patch3 -p1 -b .libdir
 %patch4 -p1 -b .pkgconf
-%patch10 -p3 -b .cloudlinux
 
 %build
 # regenerate configure script etc.
@@ -156,6 +154,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.%{pkgname}
 
 %changelog
+* Thu Mar 10 2016 David Nielson <david.nielson@cpanel.net> - 1.5.2-2
+- Removed Cloudlinux patch
+
 * Tue Oct 13 2015 Jacob Perkins <jacob.perkins@cpanel.net> - 1.5.2-1
 - Updated to version 1.5.2 via update_pkg.pl
 
