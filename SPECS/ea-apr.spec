@@ -13,8 +13,8 @@
 
 Summary: Apache Portable Runtime library
 Name: %{pkgname}
-Version: 1.5.2
-Release: 2%{?dist}
+Version: 1.5.3
+Release: 0%{?dist}
 # ASL 2.0: everything
 # ISC: network_io/apr-1.4.6/network_io/unix/inet_?to?.c
 # BSD with advertising: strings/apr_snprintf.c, strings/apr_fnmatch.c,
@@ -154,6 +154,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.%{pkgname}
 
 %changelog
+* Thu Mar 10 2016 S. Kurt Newman <kurt.newman@cpanel.net> - 1.5.3-0
+- Changed version to 1.5.3
+
 * Thu Mar 10 2016 David Nielson <david.nielson@cpanel.net> - 1.5.2-2
 - Removed Cloudlinux patch
 
